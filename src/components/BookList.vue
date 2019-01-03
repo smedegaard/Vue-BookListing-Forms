@@ -1,8 +1,9 @@
 <template>
 <div>
   <h1>{{title}}</h1>
+  <input v-model="searchInput" type="text" value="" placeholder="Search Books"/>
   <ul class="exists">
-    <book-item v-for='book in books' :key='book.id' :book='book'></book-item>
+    <book-item v-for='book in searchedBooks' :key='book.id' :book='book'></book-item>
   </ul>
   <hr/>
   
@@ -22,31 +23,38 @@
 
 <script>
   import _ from "lodash";
-  import BookItem from "./BookItem";
-  import BookForm from "./BookForm";
+import BookItem from "./BookItem";
+import BookForm from "./BookForm";
 
-  export default {
+export default {
     name: "BookList",
     data() {
-      return {
-          title: "All Books",
-          filters: ["bought", "borrowed"],
-          states: ["Want to Read", "Read", "Reading"],
-          books: [
-            { ownership: "borrowed", finishedReading: true, title: "Self-Reliance", author: "Ralph Waldo Emerson" },
-            { ownership: "bought", finishedReading: false, title: "American Gods", author: "Neil Gaiman" },
-            { ownership: "borrowed", finishedReading: true, title: "Amusing Ourselves to Death", author: "Neil Postman" }
-          ],
-          holding: "bought"
-      };
+        return {
+            title: "All Books",
+            filters: ["bought", "borrowed"],
+            states: ["Want to Read", "Read", "Reading"],
+            books: [
+                { ownership: "borrowed", finishedReading: true, title: "Self-Reliance", author: "Ralph Waldo Emerson" },
+                { ownership: "bought", finishedReading: false, title: "American Gods", author: "Neil Gaiman" },
+                { ownership: "borrowed", finishedReading: true, title: "Amusing Ourselves to Death", author: "Neil Postman" }
+            ],
+            holding: "bought",
+            searchInput: ""
+        };
     },
     components: {
-      BookItem,
-      BookForm
+        BookItem,
+        BookForm
     },
     computed: {
         filteredBooks() {
             return _.filter(this.books, ["ownership", this.holding]);
+        },
+        searchedBooks() {
+            const searchFilter = book => {
+                return book.title.toLowerCase().match(this.searchInput.toLowerCase());
+            };
+            return _.filter(this.books, searchFilter);
         }
     },
     methods: {
